@@ -3,4 +3,4 @@ Latin Learn App
 
 ### Credits
 [@Lorentious](https://github.com/Lorentious) <br>
-> [@Lorentious](https://github.com/Mochi-webdev)
+[@Lorentious](https://github.com/Mochi-webdev)
