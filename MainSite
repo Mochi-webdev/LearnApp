@@ -1,487 +1,623 @@
 <!DOCTYPE html>
 <html lang="de">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Latein Lernen – Moderne Lektionenauswahl</title>
-  <style>
-    /* Reset & Grund */
-    * {
-      box-sizing: border-box;
-      transition: all 0.3s ease;
-    }
-    body {
-      margin: 0;
-      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-      background: linear-gradient(135deg, #fff9f2 0%, #ffe0b2 100%);
-      color: #333;
-      min-height: 100vh;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-    }
-    header {
-      background-color: #ff6f00;
-      color: white;
-      width: 100%;
-      padding: 1.5rem 0;
-      text-align: center;
-      box-shadow: 0 4px 6px rgb(255 111 0 / 0.4);
-      font-weight: 700;
-      font-size: 1.8rem;
-      letter-spacing: 1.2px;
-      user-select: none;
-    }
-    main {
-      margin: 2rem auto 3rem;
-      width: 90%;
-      max-width: 600px;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-    }
-    .card {
-      background: white;
-      border-radius: 20px;
-      box-shadow: 0 10px 25px rgba(255, 111, 0, 0.2);
-      padding: 2rem;
-      width: 100%;
-      max-width: 600px;
-      margin-bottom: 2rem;
-      text-align: center;
-      user-select: none;
-    }
-    input {
-      width: 100%;
-      padding: 0.85rem 1rem;
-      margin: 0.7rem 0 1.3rem 0;
-      border-radius: 12px;
-      border: 1.5px solid #ffa726;
-      font-size: 1.05rem;
-      outline-offset: 2px;
-      outline-color: #ffb74d;
-      font-weight: 600;
-      transition: border-color 0.3s ease;
-    }
-    input:focus {
-      border-color: #ff6f00;
-      box-shadow: 0 0 8px #ff6f00aa;
-    }
-    .btn {
-      background-color: #ff6f00;
-      border: none;
-      border-radius: 12px;
-      color: white;
-      cursor: pointer;
-      font-size: 1.1rem;
-      font-weight: 700;
-      padding: 0.85rem 2rem;
-      margin: 0.5rem;
-      box-shadow: 0 5px 10px rgba(255, 111, 0, 0.5);
-      user-select: none;
-      transition: background-color 0.3s ease, transform 0.2s ease;
-    }
-    .btn:hover {
-      background-color: #ff8f00;
-      transform: translateY(-3px);
-      box-shadow: 0 8px 20px rgba(255, 111, 0, 0.7);
-    }
-    .btn:active {
-      transform: translateY(0);
-      box-shadow: 0 5px 10px rgba(255, 111, 0, 0.5);
-    }
-    .top-buttons {
-      display: flex;
-      justify-content: space-between;
-      margin-bottom: 1.5rem;
-    }
-    h2 {
-      margin-bottom: 1.2rem;
-      font-weight: 800;
-      color: #e65100;
-      user-select: none;
-    }
-    /* Lektionenauswahl als große Buttons */
-    #lesson-list {
-      display: flex;
-      flex-wrap: wrap;
-      gap: 20px;
-      justify-content: center;
-      margin-bottom: 1rem;
-    }
-    .lesson-btn {
-      background: #ff6f00;
-      color: white;
-      border: none;
-      border-radius: 18px;
-      padding: 1.2rem 2.5rem;
-      font-size: 1.25rem;
-      font-weight: 700;
-      cursor: pointer;
-      box-shadow: 0 6px 15px rgba(255, 111, 0, 0.4);
-      transition: background-color 0.3s ease, transform 0.2s ease;
-      user-select: none;
-      flex: 1 1 220px;
-      max-width: 260px;
-      text-align: center;
-    }
-    .lesson-btn:hover {
-      background-color: #ff8f00;
-      transform: translateY(-4px);
-      box-shadow: 0 10px 25px rgba(255, 111, 0, 0.65);
-    }
-    .lesson-btn:focus {
-      outline: 3px solid #ffa726;
-      outline-offset: 2px;
-    }
-    .lesson-btn.selected {
-      background-color: #ffcc80;
-      color: #e65100;
-      box-shadow: 0 0 12px #ff6f00aa;
-      cursor: default;
-      transform: none;
-    }
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Latein Lern App</title>
+<style>
+  body,html {
+    margin:0; padding:0; height:100%;
+    font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+    background:#fafafa;
+    color:#333;
+    display:flex;
+    flex-direction: column;
+    min-height: 100vh;
+  }
+  #fixedHeader {
+    position: fixed;
+    top:10px; left:15px; right:15px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    font-weight: 700;
+    font-size: 22px;
+    color: #222;
+    user-select:none;
+    z-index: 1000;
+    background: transparent;
+  }
+  #usernameDisplay {
+    font-weight: 600;
+    margin-right: 10px;
+    font-size: 16px;
+    color: #444;
+    display: none;
+  }
+  #settingsBtn {
+    background:none;
+    border:none;
+    font-size: 22px;
+    cursor:pointer;
+    color:#666;
+    padding:4px 8px;
+    border-radius:6px;
+    transition: background 0.2s ease;
+  }
+  #settingsBtn:hover {
+    background: #ddd;
+  }
 
-    /* Fragen & Optionen */
-    .question {
-      font-size: 1.3rem;
-      font-weight: 700;
-      margin-bottom: 1.5rem;
-      user-select: none;
-    }
-    #options {
-      display: flex;
-      flex-direction: column;
-      gap: 12px;
-      margin-bottom: 1.5rem;
-    }
-    .option-btn {
-      background: #ffe0b2;
-      border-radius: 12px;
-      padding: 0.9rem 1rem;
-      font-weight: 700;
-      font-size: 1.1rem;
-      border: 2px solid transparent;
-      cursor: pointer;
-      transition: background-color 0.3s ease, border-color 0.3s ease;
-      user-select: none;
-      box-shadow: 0 3px 6px rgba(255, 111, 0, 0.3);
-    }
-    .option-btn:hover:not(.disabled) {
-      background-color: #ffcc80;
-    }
-    .option-btn.correct {
-      background-color: #a5d6a7 !important;
-      border-color: #388e3c !important;
-      color: #1b5e20;
-      cursor: default;
-      box-shadow: 0 0 10px #388e3caa;
-    }
-    .option-btn.wrong {
-      background-color: #ef9a9a !important;
-      border-color: #d32f2f !important;
-      color: #b71c1c;
-      cursor: default;
-      box-shadow: 0 0 10px #d32f2faa;
-    }
-    .option-btn.disabled {
-      pointer-events: none;
-      opacity: 0.7;
-    }
+  #appContainer {
+    margin: 60px auto 70px;
+    width: 400px;
+    max-width: 95vw;
+    flex-grow: 1;
+  }
+  .card {
+    background: white;
+    border-radius: 12px;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.12);
+    padding: 30px 25px;
+    text-align: center;
+  }
+  h2,h3 {
+    margin-bottom: 20px;
+    font-weight: 600;
+  }
+  input {
+    width: 100%;
+    padding: 10px 14px;
+    margin-bottom: 15px;
+    border: 1.5px solid #ccc;
+    border-radius: 8px;
+    font-size: 16px;
+    outline-offset: 2px;
+    transition: border-color 0.3s ease;
+  }
+  input:focus {
+    border-color: #888;
+  }
+  button {
+    background: #333;
+    color: white;
+    border: none;
+    padding: 12px 0;
+    margin: 6px 0;
+    width: 100%;
+    border-radius: 8px;
+    font-size: 16px;
+    cursor: pointer;
+    transition: background 0.2s ease;
+  }
+  button:hover {
+    background: #555;
+  }
+  #authMessage, #lessonMessage {
+    min-height: 24px;
+    margin-top: 12px;
+    font-weight: 600;
+    color: #d33;
+  }
+  #authMessage.success, #lessonMessage.success {
+    color: #2a8;
+  }
 
-    .feedback {
-      font-size: 1.15rem;
-      font-weight: 700;
-      margin-top: 0.3rem;
-      min-height: 1.8rem;
-      user-select: none;
-      color: #333;
-    }
+  /* Verstecke alle Sektionen standardmäßig */
+  #auth, #menu, #lessonView, #shopView, #rankView, #questView, #settingsModal {
+    display: none;
+  }
+  .show {
+    display: block !important;
+  }
 
-    /* Fortschrittsbalken */
-    .progress-container {
-      width: 100%;
-      background: #ffecb3;
-      border-radius: 12px;
-      margin-bottom: 1.8rem;
-      height: 20px;
-      box-shadow: inset 0 2px 5px rgba(0,0,0,0.1);
-      user-select: none;
-    }
-    .progress-bar {
-      height: 100%;
-      background-color: #ff6f00;
-      border-radius: 12px;
-      width: 0%;
-      transition: width 0.4s ease;
-    }
+  /* Lektionen */
+  .lesson-card {
+    background: #eee;
+    border-radius: 14px;
+    padding: 18px 16px;
+    box-shadow: 0 3px 10px rgba(0,0,0,0.05);
+    margin-bottom: 15px;
+    cursor: pointer;
+    user-select: none;
+    transition: background 0.2s ease;
+  }
+  .lesson-card:hover {
+    background: #ddd;
+  }
+  .lesson-card.active {
+    background: #c7eaff;
+  }
+  .lesson-card h3 {
+    margin: 0;
+  }
 
-    /* Responsive */
-    @media (max-width: 400px) {
-      .btn {
-        padding: 0.65rem 1.3rem;
-        font-size: 1rem;
-      }
-      .question {
-        font-size: 1.1rem;
-      }
-      .lesson-btn {
-        flex: 1 1 100%;
-        max-width: 100%;
-      }
-    }
-  </style>
+  /* Antwort Buttons */
+  .answer-btn {
+    background: #eee;
+    color: #222;
+    margin: 8px 0;
+    padding: 12px 10px;
+    border-radius: 10px;
+    font-weight: 600;
+    cursor: pointer;
+    border: 2px solid transparent;
+    transition: background 0.3s, border-color 0.3s;
+  }
+  .answer-btn:hover {
+    background: #ddd;
+  }
+  .answer-btn.correct {
+    background: #4CAF50;
+    color: white;
+    border-color: #3e8e41;
+  }
+  .answer-btn.incorrect {
+    background: #f44336;
+    color: white;
+    border-color: #b93126;
+  }
+  .answer-btn.disabled {
+    cursor: default;
+    pointer-events: none;
+  }
+
+  /* Fortschrittsbalken */
+  #progressBarContainer {
+    margin: 20px 0 10px;
+    background: #ddd;
+    border-radius: 20px;
+    height: 16px;
+    overflow: hidden;
+  }
+  #progressBar {
+    height: 100%;
+    width: 0%;
+    background: #4caf50;
+    border-radius: 20px;
+    transition: width 0.4s ease;
+  }
+
+  /* Settings Modal */
+  #settingsModal {
+    position: fixed;
+    top:0; left:0; right:0; bottom:0;
+    background: rgba(0,0,0,0.3);
+    justify-content: center;
+    align-items: center;
+    z-index: 1100;
+  }
+  #settingsContent {
+    background: white;
+    border-radius: 14px;
+    padding: 30px 25px;
+    width: 300px;
+    box-shadow: 0 8px 20px rgba(0,0,0,0.15);
+    text-align: center;
+  }
+  #settingsContent h3 {
+    margin-top: 0;
+  }
+  #settingsContent button {
+    background: #c33;
+    margin-top: 15px;
+    width: 100%;
+  }
+  #settingsContent button:hover {
+    background: #a22;
+  }
+  #settingsCloseBtn {
+    margin-top: 12px;
+    background: #888;
+    width: 100%;
+  }
+  #settingsCloseBtn:hover {
+    background: #555;
+  }
+
+  /* Bottom Navigation Bar */
+  #bottomNavBar {
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    height: 60px;
+    background: white;
+    border-top: 1px solid #ddd;
+    display: flex;
+    justify-content: space-around;
+    align-items: center;
+    box-shadow: 0 -2px 6px rgba(0,0,0,0.05);
+    user-select: none;
+    z-index: 1000;
+    display: none; /* start hidden */
+  }
+  .nav-btn {
+    flex-grow: 1;
+    color: #666;
+    font-size: 12px;
+    font-weight: 600;
+    text-align: center;
+    cursor: pointer;
+    padding: 6px 4px 2px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    transition: color 0.2s ease;
+  }
+  .nav-btn svg {
+    width: 24px;
+    height: 24px;
+    margin-bottom: 4px;
+    fill: currentColor;
+  }
+  .nav-btn.active {
+    color: #4caf50;
+  }
+  .nav-btn:hover:not(.active) {
+    color: #4caf50;
+  }
+</style>
 </head>
 <body>
-  <header>Latein Lernen</header>
-  <main>
-    <!-- Login -->
-    <div id="auth" class="card">
-      <h2>Login / Registrieren</h2>
-      <input type="text" id="username" placeholder="Benutzername" autocomplete="username" />
-      <input type="password" id="password" placeholder="Passwort" autocomplete="current-password" />
-      <button class="btn" onclick="login()">Loslegen</button>
-    </div>
 
-    <!-- Hauptmenü -->
-    <div id="menu" class="card" style="display:none;">
-      <div class="top-buttons">
-        <button class="btn" onclick="showSettings()">⚙️ Einstellungen</button>
-        <button class="btn" onclick="logout()">🚪 Abmelden</button>
-      </div>
-      <h2>Lektionen</h2>
-      <div id="lesson-list">
-        <!-- Dynamisch gefüllt mit Buttons -->
-      </div>
-      <button id="start-lesson-btn" class="btn" disabled>Lektion starten</button>
-    </div>
+<!-- Header -->
+<div id="fixedHeader">
+  <div>Lern App</div>
+  <div style="display:flex; align-items:center;">
+    <div id="usernameDisplay"></div>
+    <button id="settingsBtn" title="Einstellungen ⚙️" style="display:none;">⚙️</button>
+  </div>
+</div>
 
-    <!-- Lektion -->
-    <div id="lesson" class="card" style="display:none;">
-      <div class="top-buttons" style="justify-content: flex-end;">
-        <button class="btn" onclick="returnToMenu()">⬅️ Zurück zum Menü</button>
-      </div>
-      <div class="progress-container" aria-label="Fortschrittsbalken">
-        <div id="progress-bar" class="progress-bar"></div>
-      </div>
-      <div id="question" class="question">Frage hier</div>
-      <div id="options"></div>
-      <div id="feedback" class="feedback"></div>
-      <button id="next-btn" class="btn" onclick="nextQuestion()" disabled>Nächste Frage</button>
-    </div>
-  </main>
+<!-- App Container -->
+<div id="appContainer">
 
-  <script>
-    const authDiv = document.getElementById("auth");
-    const menuDiv = document.getElementById("menu");
-    const lessonDiv = document.getElementById("lesson");
-    const lessonListDiv = document.getElementById("lesson-list");
-    const startLessonBtn = document.getElementById("start-lesson-btn");
-    const questionEl = document.getElementById("question");
-    const optionsEl = document.getElementById("options");
-    const feedbackEl = document.getElementById("feedback");
-    const nextBtn = document.getElementById("next-btn");
-    const progressBar = document.getElementById("progress-bar");
+  <!-- Login/Register -->
+  <div id="auth" class="card show">
+    <h2>Login / Registrieren</h2>
+    <input type="text" id="username" placeholder="Benutzername" autocomplete="username" />
+    <input type="password" id="password" placeholder="Passwort" autocomplete="current-password" />
+    <button id="loginBtn">Anmelden</button>
+    <button id="registerBtn">Registrieren</button>
+    <div id="authMessage"></div>
+  </div>
 
-    // Beispiel-Lektionen mit Fragen
-    const lessons = [
-      {
-        title: "Wörter 1",
-        questions: [
-          { q: "Was bedeutet 'rosa'?", a: ["rot", "rosa", "blau", "grün"], c: "rosa" },
-          { q: "Was heißt 'puer'?", a: ["Junge", "Mädchen", "Mann", "Frau"], c: "Junge" },
-          { q: "Übersetze 'aqua'", a: ["Feuer", "Wasser", "Erde", "Luft"], c: "Wasser" },
-        ],
-      },
-      {
-        title: "Verben 1",
-        questions: [
-          { q: "Was bedeutet 'amare'?", a: ["lieben", "essen", "gehen", "sehen"], c: "lieben" },
-          { q: "Was heißt 'currere'?", a: ["laufen", "sitzen", "springen", "fliegen"], c: "laufen" },
-          { q: "Übersetze 'videre'", a: ["hören", "sehen", "sprechen", "trinken"], c: "sehen" },
-        ],
-      },
-      {
-        title: "Grammatik Basics",
-        questions: [
-          { q: "Welcher Kasus zeigt das Subjekt an?", a: ["Akkusativ", "Nominativ", "Genitiv", "Dativ"], c: "Nominativ" },
-          { q: "Was ist der Genitiv von 'puella'?", a: ["puellam", "puellae", "puellas", "puello"], c: "puellae" },
-          { q: "Plural von 'amicus'?", a: ["amici", "amicas", "amicorum", "amicos"], c: "amici" },
-        ],
-      },
-      {
-        title: "Vokabeln 2",
-        questions: [
-          { q: "Was heißt 'terra'?", a: ["Erde", "Feuer", "Wasser", "Luft"], c: "Erde" },
-          { q: "Bedeutung von 'bellum'?", a: ["Friede", "Krieg", "Leben", "Tod"], c: "Krieg" },
-          { q: "Übersetze 'liber'", a: ["Buch", "Freund", "Baum", "Haus"], c: "Buch" },
-        ],
-      },
-      {
-        title: "Adjektive",
-        questions: [
-          { q: "Bedeutung von 'magnus'?", a: ["klein", "groß", "schnell", "langsam"], c: "groß" },
-          { q: "Übersetze 'fortis'", a: ["stark", "schwach", "jung", "alt"], c: "stark" },
-          { q: "Was heißt 'pulcher'?", a: ["schön", "hässlich", "alt", "jung"], c: "schön" },
-        ],
-      }
-    ];
+  <!-- Menü / Lektionen -->
+  <div id="menu" class="card">
+    <h2>Wähle eine Lektion</h2>
+    <div id="lessonList"></div>
+  </div>
 
-    let currentLessonIndex = null;
-    let currentQuestionIndex = 0;
-    let answered = false;
+  <!-- Lektion Ansicht -->
+  <div id="lessonView" class="card">
+    <h2 id="lessonTitle"></h2>
+    <div id="progressBarContainer"><div id="progressBar"></div></div>
+    <div id="questionText" style="font-weight:600; margin-bottom: 20px;"></div>
+    <div id="answersContainer"></div>
+    <div id="lessonMessage"></div>
+    <button id="backToMenuBtn" style="margin-top:20px;">Zurück zum Menü</button>
+  </div>
 
-    // Login-Check bei Laden
-    window.onload = () => {
-      const user = localStorage.getItem("lateinUser");
-      if (user) {
-        authDiv.style.display = "none";
-        showMenu();
-      } else {
-        authDiv.style.display = "block";
-        menuDiv.style.display = "none";
-        lessonDiv.style.display = "none";
-      }
-    };
+  <!-- Weitere Bereiche, nur Platzhalter -->
+  <div id="shopView" class="card"><h2>Shop (kommt bald)</h2></div>
+  <div id="rankView" class="card"><h2>Rangliste (kommt bald)</h2></div>
+  <div id="questView" class="card"><h2>Quests (kommt bald)</h2></div>
 
-    // Login Funktion
-    function login() {
-      const user = document.getElementById("username").value.trim();
-      const pass = document.getElementById("password").value.trim();
-      if (!user || !pass) {
-        alert("Bitte Benutzername und Passwort eingeben.");
-        return;
-      }
-      localStorage.setItem("lateinUser", JSON.stringify({ user, pass }));
-      authDiv.style.display = "none";
-      showMenu();
+</div>
+
+<!-- Bottom Navigation Bar -->
+<div id="bottomNavBar">
+  <div class="nav-btn active" data-section="menu" title="Lektion">
+    <svg viewBox="0 0 24 24"><path d="M19 2H9a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h10V2zM7 4H5a2 2 0 0 0-2 2v14a1 1 0 0 0 1.447.894L7 19.118V4z"/></svg>
+    Lektion
+  </div>
+  <div class="nav-btn" data-section="quest" title="Quest">
+    <svg viewBox="0 0 24 24"><path d="M12 2a10 10 0 1 0 10 10A10 10 0 0 0 12 2zm0 18a8 8 0 1 1 8-8 8 8 0 0 1-8 8zm0-13a5 5 0 1 0 5 5 5 5 0 0 0-5-5z"/></svg>
+    Quest
+  </div>
+  <div class="nav-btn" data-section="shop" title="Shop">
+    <svg viewBox="0 0 24 24"><path d="M3 6h18v2H3zm2 4h14l-1.5 8.5a1 1 0 0 1-1 .5H8a1 1 0 0 1-1-.5L5 10z"/></svg>
+    Shop
+  </div>
+  <div class="nav-btn" data-section="rank" title="Rang">
+    <svg viewBox="0 0 24 24"><path d="M17 4V2H7v2H2v4a7 7 0 0 0 14 0V4zm-7 4v5h2v-5z"/></svg>
+    Rang
+  </div>
+</div>
+
+<!-- Settings Modal -->
+<div id="settingsModal">
+  <div id="settingsContent">
+    <h3>Einstellungen</h3>
+    <button id="logoutBtn">Abmelden</button>
+    <button id="settingsCloseBtn">Schließen</button>
+  </div>
+</div>
+
+<script>
+(() => {
+  // Simulierte User-Datenbank (im echten Fall Serveranbindung)
+  const userDB = JSON.parse(localStorage.getItem("userDB") || "{}");
+  // User-Daten im Session-Storage, bleibt bei Tab offen
+  let currentUser = sessionStorage.getItem("currentUser") || null;
+
+  // Lektionen mit Fragen, Antworten, korrekter Index
+  const lessons = [
+    {
+      id: "lektion1",
+      title: "Lektion 1 - Basics",
+      questions: [
+        {
+          question: "Was bedeutet 'amicus'?",
+          answers: ["Freund", "Feind", "Haus", "Baum"],
+          correct: 0
+        },
+        {
+          question: "Was bedeutet 'puella'?",
+          answers: ["Mädchen", "Junge", "Baum", "Himmel"],
+          correct: 0
+        }
+      ]
+    },
+    {
+      id: "lektion2",
+      title: "Lektion 2 - Fortgeschritten",
+      questions: [
+        {
+          question: "Was heißt 'bellum'?",
+          answers: ["Krieg", "Friede", "Haus", "Freund"],
+          correct: 0
+        },
+        {
+          question: "Was bedeutet 'tempus'?",
+          answers: ["Zeit", "Ort", "Mensch", "Baum"],
+          correct: 0
+        }
+      ]
+    }
+  ];
+
+  // State
+  let selectedLesson = null;
+  let currentQuestionIndex = 0;
+
+  // DOM Elemente
+  const authSection = document.getElementById("auth");
+  const menuSection = document.getElementById("menu");
+  const lessonView = document.getElementById("lessonView");
+  const lessonList = document.getElementById("lessonList");
+  const lessonTitle = document.getElementById("lessonTitle");
+  const questionText = document.getElementById("questionText");
+  const answersContainer = document.getElementById("answersContainer");
+  const lessonMessage = document.getElementById("lessonMessage");
+  const backToMenuBtn = document.getElementById("backToMenuBtn");
+  const loginBtn = document.getElementById("loginBtn");
+  const registerBtn = document.getElementById("registerBtn");
+  const usernameInput = document.getElementById("username");
+  const passwordInput = document.getElementById("password");
+  const authMessage = document.getElementById("authMessage");
+  const usernameDisplay = document.getElementById("usernameDisplay");
+  const bottomNavBar = document.getElementById("bottomNavBar");
+  const navButtons = bottomNavBar.querySelectorAll(".nav-btn");
+  const settingsBtn = document.getElementById("settingsBtn");
+  const settingsModal = document.getElementById("settingsModal");
+  const logoutBtn = document.getElementById("logoutBtn");
+  const settingsCloseBtn = document.getElementById("settingsCloseBtn");
+  const progressBar = document.getElementById("progressBar");
+
+  // Hilfsfunktion zum Wechseln der angezeigten Sektion
+  function showSection(section) {
+    // Alle ausblenden
+    [authSection, menuSection, lessonView,
+     document.getElementById("shopView"),
+     document.getElementById("rankView"),
+     document.getElementById("questView")].forEach(s => s.classList.remove("show"));
+
+    // Bottom Nav Bar: Aktivieren / Deaktivieren
+    if (section === menuSection || section === lessonView
+        || section === document.getElementById("shopView")
+        || section === document.getElementById("rankView")
+        || section === document.getElementById("questView")) {
+      bottomNavBar.style.display = "flex";
+    } else {
+      bottomNavBar.style.display = "none";
     }
 
-    // Abmelden
-    function logout() {
-      localStorage.removeItem("lateinUser");
-      location.reload();
+    // Zeige gewünschte Sektion
+    if(section) section.classList.add("show");
+  }
+
+  // Login Funktion
+  function login(username, password) {
+    authMessage.textContent = "";
+    if (!username || !password) {
+      authMessage.textContent = "Bitte Benutzername und Passwort eingeben.";
+      return false;
     }
-
-    // Einstellungen (Platzhalter)
-    function showSettings() {
-      alert("Einstellungen werden bald verfügbar sein!");
+    if (!userDB[username]) {
+      authMessage.textContent = "Benutzer nicht gefunden.";
+      return false;
     }
-
-    // Menü anzeigen und Lektionen als Buttons listen
-    function showMenu() {
-      lessonListDiv.innerHTML = "";
-      startLessonBtn.disabled = true;
-      currentLessonIndex = null;
-
-      lessons.forEach((lesson, index) => {
-        const btn = document.createElement("button");
-        btn.className = "lesson-btn";
-        btn.textContent = `Lektion ${index + 1}: ${lesson.title}`;
-        btn.onclick = () => selectLesson(index);
-        lessonListDiv.appendChild(btn);
-      });
-
-      lessonDiv.style.display = "none";
-      menuDiv.style.display = "block";
+    if (userDB[username] !== password) {
+      authMessage.textContent = "Falsches Passwort.";
+      return false;
     }
+    currentUser = username;
+    sessionStorage.setItem("currentUser", currentUser);
+    authMessage.textContent = "";
+    showAppAfterLogin();
+    return true;
+  }
 
-    // Lektion auswählen und Button hervorheben
-    function selectLesson(index) {
-      currentLessonIndex = index;
-      Array.from(lessonListDiv.children).forEach((btn, i) => {
-        btn.classList.toggle("selected", i === index);
-      });
-      startLessonBtn.disabled = false;
+  // Registrierung Funktion
+  function register(username, password) {
+    authMessage.textContent = "";
+    if (!username || !password) {
+      authMessage.textContent = "Bitte Benutzername und Passwort eingeben.";
+      return false;
     }
+    if (userDB[username]) {
+      authMessage.textContent = "Benutzername schon vergeben.";
+      return false;
+    }
+    userDB[username] = password;
+    localStorage.setItem("userDB", JSON.stringify(userDB));
+    authMessage.textContent = "Registrierung erfolgreich! Bitte anmelden.";
+    return true;
+  }
 
-    // Lektion starten
-    startLessonBtn.onclick = () => {
-      if (currentLessonIndex !== null) {
+  // Nach Login, zeige Menü und Bottom-Bar, Header Username, Settings Button
+  function showAppAfterLogin() {
+    usernameDisplay.textContent = currentUser;
+    usernameDisplay.style.display = "inline-block";
+    settingsBtn.style.display = "inline-block";
+    usernameInput.value = "";
+    passwordInput.value = "";
+    authMessage.textContent = "";
+    showSection(menuSection);
+    renderLessonList();
+  }
+
+  // Logout Funktion
+  function logout() {
+    currentUser = null;
+    sessionStorage.removeItem("currentUser");
+    usernameDisplay.style.display = "none";
+    settingsBtn.style.display = "none";
+    showSection(authSection);
+  }
+
+  // Lektionen Liste anzeigen
+  function renderLessonList() {
+    lessonList.innerHTML = "";
+    lessons.forEach(lesson => {
+      const div = document.createElement("div");
+      div.className = "lesson-card";
+      div.textContent = lesson.title;
+      div.onclick = () => {
+        selectedLesson = lesson;
         currentQuestionIndex = 0;
-        answered = false;
-        loadQuestion();
-        menuDiv.style.display = "none";
-        lessonDiv.style.display = "block";
-        updateProgress();
-      }
-    };
+        startLesson();
+      };
+      lessonList.appendChild(div);
+    });
+  }
 
-    // Frage laden
-    function loadQuestion() {
-      answered = false;
-      feedbackEl.textContent = "";
-      nextBtn.disabled = true;
+  // Start Lektion: erste Frage laden
+  function startLesson() {
+    lessonMessage.textContent = "";
+    lessonTitle.textContent = selectedLesson.title;
+    showSection(lessonView);
+    renderQuestion();
+  }
 
-      const questionData = lessons[currentLessonIndex].questions[currentQuestionIndex];
-      questionEl.textContent = questionData.q;
-
-      optionsEl.innerHTML = "";
-      questionData.a.forEach(opt => {
-        const btn = document.createElement("button");
-        btn.className = "option-btn";
-        btn.textContent = opt;
-        btn.onclick = () => selectAnswer(btn, opt, questionData.c);
-        optionsEl.appendChild(btn);
-      });
-    }
-
-    // Antwort auswählen
-    function selectAnswer(btn, answer, correctAnswer) {
-      if (answered) return;
-      answered = true;
-
-      Array.from(optionsEl.children).forEach(b => {
-        b.classList.add("disabled");
-        b.onclick = null;
-      });
-
-      if (answer === correctAnswer) {
-        btn.classList.add("correct");
-        feedbackEl.style.color = "#2e7d32"; // grün
-        feedbackEl.textContent = "✅ Richtig!";
-      } else {
-        btn.classList.add("wrong");
-        feedbackEl.style.color = "#c62828"; // rot
-        feedbackEl.textContent = `❌ Falsch! Richtige Antwort: ${correctAnswer}`;
-        // Richtig markieren:
-        Array.from(optionsEl.children).forEach(b => {
-          if (b.textContent === correctAnswer) {
-            b.classList.add("correct");
-          }
-        });
-      }
-      nextBtn.disabled = false;
-    }
-
-    // Nächste Frage oder Lektion Ende
-    function nextQuestion() {
-      currentQuestionIndex++;
-      if (currentQuestionIndex >= lessons[currentLessonIndex].questions.length) {
-        feedbackEl.style.color = "#ef6c00";
-        feedbackEl.textContent = "🎉 Lektion abgeschlossen! Zurück zum Menü.";
-        nextBtn.disabled = true;
-        setTimeout(() => {
-          returnToMenu();
-        }, 2000);
-      } else {
-        loadQuestion();
-        updateProgress();
-      }
-    }
+  // Frage und Antworten anzeigen
+  function renderQuestion() {
+    const q = selectedLesson.questions[currentQuestionIndex];
+    questionText.textContent = q.question;
+    answersContainer.innerHTML = "";
+    lessonMessage.textContent = "";
 
     // Fortschritt aktualisieren
-    function updateProgress() {
-      const total = lessons[currentLessonIndex].questions.length;
-      const progressPercent = (currentQuestionIndex / total) * 100;
-      progressBar.style.width = progressPercent + "%";
+    const progressPercent = Math.floor((currentQuestionIndex / selectedLesson.questions.length) * 100);
+    progressBar.style.width = progressPercent + "%";
+
+    q.answers.forEach((answer, i) => {
+      const btn = document.createElement("button");
+      btn.className = "answer-btn";
+      btn.textContent = answer;
+      btn.onclick = () => checkAnswer(i, btn);
+      answersContainer.appendChild(btn);
+    });
+  }
+
+  // Antwort prüfen
+  function checkAnswer(selectedIndex, btnClicked) {
+    const q = selectedLesson.questions[currentQuestionIndex];
+    const buttons = answersContainer.querySelectorAll("button");
+    buttons.forEach(b => {
+      b.classList.add("disabled");
+      b.onclick = null;
+    });
+
+    if (selectedIndex === q.correct) {
+      btnClicked.classList.add("correct");
+      lessonMessage.textContent = "Richtig!";
+      lessonMessage.className = "success";
+    } else {
+      btnClicked.classList.add("incorrect");
+      lessonMessage.textContent = "Falsch! Richtig wäre: " + q.answers[q.correct];
+      lessonMessage.className = "";
+      // Richtige Antwort hervorheben
+      buttons[q.correct].classList.add("correct");
     }
 
-    // Zurück zum Menü
-    function returnToMenu() {
-      lessonDiv.style.display = "none";
-      showMenu();
+    // Nächste Frage oder Ende nach 1.5 Sekunden
+    setTimeout(() => {
+      currentQuestionIndex++;
+      if (currentQuestionIndex >= selectedLesson.questions.length) {
+        // Lektion beendet
+        progressBar.style.width = "100%";
+        lessonMessage.textContent = "Lektion abgeschlossen!";
+        lessonMessage.className = "success";
+        answersContainer.innerHTML = "";
+      } else {
+        renderQuestion();
+      }
+    }, 1500);
+  }
+
+  // Navigation Bottom Bar Klick
+  function navBarClick(event) {
+    const btn = event.target.closest(".nav-btn");
+    if (!btn) return;
+    if (!currentUser) return; // Nur eingeloggt
+    const sectionName = btn.dataset.section;
+
+    navButtons.forEach(b => b.classList.remove("active"));
+    btn.classList.add("active");
+
+    switch (sectionName) {
+      case "menu": showSection(menuSection); break;
+      case "shop": showSection(document.getElementById("shopView")); break;
+      case "rank": showSection(document.getElementById("rankView")); break;
+      case "quest": showSection(document.getElementById("questView")); break;
     }
-  </script>
+  }
+
+  // Event Listeners
+  loginBtn.addEventListener("click", () => {
+    login(usernameInput.value.trim(), passwordInput.value);
+  });
+  registerBtn.addEventListener("click", () => {
+    register(usernameInput.value.trim(), passwordInput.value);
+  });
+  backToMenuBtn.addEventListener("click", () => {
+    showSection(menuSection);
+    lessonMessage.textContent = "";
+  });
+  bottomNavBar.addEventListener("click", navBarClick);
+  settingsBtn.addEventListener("click", () => {
+    settingsModal.style.display = "flex";
+  });
+  logoutBtn.addEventListener("click", () => {
+    logout();
+    settingsModal.style.display = "none";
+  });
+  settingsCloseBtn.addEventListener("click", () => {
+    settingsModal.style.display = "none";
+  });
+
+  // Beim Laden: Wenn User im SessionStorage ist, direkt App anzeigen
+  if (currentUser && userDB[currentUser]) {
+    showAppAfterLogin();
+  } else {
+    showSection(authSection);
+  }
+
+})();
+</script>
+
 </body>
 </html>
