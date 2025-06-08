@@ -1,5 +1,5 @@
 # LearnApp
 Latin Learn App
 
-###Credits
+### Credits
 @Lorentious
