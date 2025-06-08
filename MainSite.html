@@ -1,4 +1,6 @@
 <!DOCTYPE html>
+<script src="lessons.js"></script>
+
 <html lang="de">
 <head>
 <meta charset="UTF-8" />
@@ -263,12 +265,14 @@
 
 <!-- Header -->
 <div id="fixedHeader">
-  <div>Lern App</div>
+  <div>Latein Lern App</div>
   <div style="display:flex; align-items:center;">
     <div id="usernameDisplay"></div>
+    <div id="xpDisplay" style="margin-right: 10px; font-weight: 600; color: #4caf50; display:none;">XP: 0</div>
     <button id="settingsBtn" title="Einstellungen ⚙️" style="display:none;">⚙️</button>
   </div>
 </div>
+
 
 <!-- App Container -->
 <div id="appContainer">
@@ -298,11 +302,25 @@
     <div id="lessonMessage"></div>
     <button id="backToMenuBtn" style="margin-top:20px;">Zurück zum Menü</button>
   </div>
+  <script src="quests.js"></script>
 
   <!-- Weitere Bereiche, nur Platzhalter -->
   <div id="shopView" class="card"><h2>Shop (kommt bald)</h2></div>
   <div id="rankView" class="card"><h2>Rangliste (kommt bald)</h2></div>
-  <div id="questView" class="card"><h2>Quests (kommt bald)</h2></div>
+  <div id="questView" class="card">
+  <h2>Quests</h2>
+  <!-- Quest-Bereich -->
+  <div id="questList"></div>
+  <div id="questDetails" style="display:none;">
+  <h2 id="questTitle"></h2>
+  <p id="questDescription"></p>
+  <button id="completeQuestBtn">Quest abschließen</button>
+  <button id="backToQuestListBtn">Zurück zur Questliste</button>
+  <p id="questMessage"></p>
+  </div>
+</div>
+
+  
 
 </div>
 
@@ -336,88 +354,21 @@
 </div>
 
 <script>
+  
 (() => {
+  
   // Simulierte User-Datenbank (im echten Fall Serveranbindung)
   const userDB = JSON.parse(localStorage.getItem("userDB") || "{}");
   // User-Daten im Session-Storage, bleibt bei Tab offen
   let currentUser = sessionStorage.getItem("currentUser") || null;
 
   // Lektionen mit Fragen, Antworten, korrekter Index
-  const lessons = [
-    {
-      id: "lektion1",
-      title: "Lektion 1 - Basics",
-      questions: [
-        {
-          question: "Was bedeutet 'amicus'?",
-          answers: ["Freund", "Feind", "Haus", "Baum"],
-          correct: 0
-        },
-        {
-          question: "Was bedeutet 'puella'?",
-          answers: ["Mädchen", "Junge", "Baum", "Himmel"],
-          correct: 0
-        },
-        {
-          question: "Was bedeutet 'iter'?",
-          answers: ["Krieg", "Weg", "Was?", "Durch"],
-          correct: 1
-        },
-        {
-          question: "Was bedeutet 'qui'?",
-          answers: ["Baum", "Weg", "Welche", "Weil"],
-          correct: 2
-        },
-        {
-          question: "Was bedeutet 'quid'?",
-          answers: ["Deswegen", "Was?", "Welche", "Weil"],
-          correct: 1
-        },
-        {
-          question: "Was bedeutet 'iubere'?",
-          answers: ["Befehlen", "So", "Taumeln", "Obwohl"],
-          correct: 0
-        },
-
-      ]
-    },
-    {
-      id: "lektion2",
-      title: "Lektion 2 - Fortgeschritten",
-      questions: [
-        {
-          question: "Was heißt 'bellum'?",
-          answers: ["Krieg", "Friede", "Haus", "Freund"],
-          correct: 0
-        },
-        {
-          question: "Was bedeutet 'tempus'?",
-          answers: ["Zeit", "Ort", "Mensch", "Baum"],
-          correct: 0
-        }
-      ]
-    },
-    {
-      id: "lektion3",
-      title: "Lektion 3 - WH-Lek.20-Pontes",
-      questions: [
-        {
-          question: "Was heißt 'auris'?",
-          answers: ["Ohr", "Friede", "Baumhaus", "Wohlstand"],
-          correct: 0
-        },
-        {
-          question: "Was bedeutet 'constituere'?",
-          answers: ["laufen", "beschließen", "Mensch", "reiten"],
-          correct: 0
-        }
-      ]
-    }
-  ];
 
   // State
   let selectedLesson = null;
   let currentQuestionIndex = 0;
+
+  
 
   // DOM Elemente
   const authSection = document.getElementById("auth");
