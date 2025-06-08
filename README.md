@@ -2,4 +2,4 @@
 Latin Learn App
 
 ### Credits
-@Lorentious
+[@Lorentious](https://github.com/Lorentious)
