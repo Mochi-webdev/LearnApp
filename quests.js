@@ -1,22 +1,53 @@
 console.log("quests.js geladen!");
 
-// Beispiel-Quests
 const quests = [
   {
     id: 1,
     title: "Mache eine Lektion",
     description: "Schließe eine beliebige Lektion ab.",
     completed: false,
-    canComplete: false // Nur abschließbar, wenn Aufgabe erledigt
+    canComplete: false,
+    reward: 10 // <-- Coins als Reward
   },
   {
     id: 2,
     title: "Beantworte 5 Fragen richtig",
     description: "Beantworte insgesamt 5 Fragen korrekt.",
     completed: false,
-    canComplete: false
+    canComplete: false,
+    reward: 20
   }
 ];
+
+function getQuestKey() {
+  return "questProgress_" + (window.currentUser || "default");
+}
+
+// Speichert den Quest-Status im localStorage pro User
+function saveQuestProgress() {
+  localStorage.setItem(getQuestKey(), JSON.stringify(quests));
+}
+
+// Lädt den Quest-Status aus dem localStorage pro User
+function loadQuestProgress() {
+  const saved = localStorage.getItem(getQuestKey());
+  if (saved) {
+    const arr = JSON.parse(saved);
+    arr.forEach(savedQuest => {
+      const quest = quests.find(q => q.id === savedQuest.id);
+      if (quest) {
+        quest.completed = savedQuest.completed;
+        quest.canComplete = savedQuest.canComplete;
+      }
+    });
+  } else {
+    // Wenn kein Fortschritt: Quests zurücksetzen
+    quests.forEach(q => {
+      q.completed = false;
+      q.canComplete = false;
+    });
+  }
+}
 
 function renderQuests() {
   const questList = document.getElementById("questList");
@@ -66,14 +97,32 @@ function renderQuests() {
       completeQuest(id);
     };
   });
+
+  saveQuestProgress(); // <-- Fortschritt speichern!
+}
+
+function showQuestOverlay(title, text) {
+  const overlay = document.getElementById("questOverlay");
+  document.getElementById("questOverlayTitle").textContent = title;
+  document.getElementById("questOverlayText").textContent = text;
+  overlay.style.display = "flex";
 }
 
 function completeQuest(id) {
   const quest = quests.find(q => q.id === id);
   if (quest && !quest.completed && quest.canComplete) {
     quest.completed = true;
+    // Coins gutschreiben
+    if (window.currentUser && window.userDB) {
+      window.userDB[window.currentUser].coins = (window.userDB[window.currentUser].coins || 0) + (quest.reward || 0);
+      localStorage.setItem("userDB", JSON.stringify(window.userDB));
+      if (window.updateCoinDisplay) window.updateCoinDisplay();
+    }
     renderQuests();
-    alert(`Quest "${quest.title}" abgeschlossen!`);
+    showQuestOverlay(
+      `Quest "${quest.title}" abgeschlossen!`,
+      `Du erhältst <b>${quest.reward || 0} Coins</b>.`
+    );
   }
 }
 
@@ -96,4 +145,16 @@ window.questFrageRichtig = window.questFrageRichtig || function() {
     quest.canComplete = true;
     renderQuests();
   }
+};
+
+// Beim Laden der Seite Quest-Status laden:
+loadQuestProgress();
+
+window.quests = quests;
+
+window.onUserChange = function() {
+  // Zähler für richtige Antworten zurücksetzen!
+  window.questFrageRichtig.count = 0;
+  loadQuestProgress();
+  renderQuests();
 };
