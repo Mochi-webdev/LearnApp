@@ -259,6 +259,25 @@
   .nav-btn:hover:not(.active) {
     color: #4caf50;
   }
+
+  body.theme-blue {
+  --main-bg: #e3f0ff;
+  --main-color: #1565c0;
+  --accent: #1976d2;
+}
+body {
+  background: var(--main-bg, #fafafa);
+  color: var(--main-color, #333);
+}
+#fixedHeader, .card, #settingsContent {
+  background: var(--main-bg, white);
+}
+button, .nav-btn.active {
+  background: #333;
+}
+button:hover {
+  background: #555;
+}
 </style>
 </head>
 <script src="quests.js"></script>
@@ -266,7 +285,12 @@
 
 <!-- Header -->
 <div id="fixedHeader">
-  <div>Latein Lern App</div>
+  <div style="display:flex;align-items:center;">
+    <div id="profilePicContainer" style="margin-right:12px;">
+      <div id="profilePic" style="width:38px;height:38px;border-radius:50%;background:#eee;position:relative;overflow:hidden;display:flex;align-items:center;justify-content:center;font-size:26px;">🙂</div>
+    </div>
+    <div>Latein Lern App</div>
+  </div>
   <div style="display:flex; align-items:center;">
     <div id="usernameDisplay"></div>
     <div id="xpDisplay" style="margin-right: 10px; font-weight: 600; color: #4caf50; display:none;">XP: 0</div>
@@ -349,7 +373,20 @@
 <div id="settingsModal">
   <div id="settingsContent">
     <h3>Einstellungen</h3>
-    <button id="logoutBtn">Abmelden</button>
+    <div style="margin-bottom:18px;">
+      <button id="settingsTabAccount" class="settings-tab active">Account</button>
+      <button id="settingsTabAvatar" class="settings-tab">Avatar</button>
+      <button id="settingsTabThemes" class="settings-tab">Farbthemen</button>
+    </div>
+    <div id="settingsAccount">
+      <button id="logoutBtn">Abmelden</button>
+    </div>
+    <div id="settingsAvatar" style="display:none;">
+      <div id="avatarEquipList"></div>
+    </div>
+    <div id="settingsThemes" style="display:none;">
+      <div id="themeList"></div>
+    </div>
     <button id="settingsCloseBtn">Schließen</button>
   </div>
 </div>
@@ -394,6 +431,14 @@
   const logoutBtn = document.getElementById("logoutBtn");
   const settingsCloseBtn = document.getElementById("settingsCloseBtn");
   const progressBar = document.getElementById("progressBar");
+  const settingsTabAccount = document.getElementById("settingsTabAccount");
+  const settingsTabThemes = document.getElementById("settingsTabThemes");
+  const settingsTabAvatar = document.getElementById("settingsTabAvatar");
+  const settingsAccount = document.getElementById("settingsAccount");
+  const settingsAvatar = document.getElementById("settingsAvatar");
+  const settingsThemes = document.getElementById("settingsThemes");
+  const themeList = document.getElementById("themeList");
+  const avatarEquipList = document.getElementById("avatarEquipList");
 
   // Hilfsfunktion zum Wechseln der angezeigten Sektion
   function showSection(section) {
@@ -428,7 +473,7 @@
       authMessage.textContent = "Benutzer nicht gefunden.";
       return false;
     }
-    if (userDB[username] !== password) {
+    if (userDB[username].password !== password) {
       authMessage.textContent = "Falsches Passwort.";
       return false;
     }
@@ -450,9 +495,10 @@
       authMessage.textContent = "Benutzername schon vergeben.";
       return false;
     }
-    userDB[username] = password;
+    userDB[username] = { password, coins: 0 };
     localStorage.setItem("userDB", JSON.stringify(userDB));
     authMessage.textContent = "Registrierung erfolgreich! Bitte anmelden.";
+    updateCoinDisplay(); // <-- Coins anzeigen (optional)
     return true;
   }
 
@@ -466,6 +512,8 @@
     authMessage.textContent = "";
     showSection(menuSection);
     renderLessonList();
+    updateCoinDisplay();
+    if (window.onUserChange) window.onUserChange(); // <-- Quests für User laden!
   }
 
   // Logout Funktion
@@ -475,6 +523,7 @@
     usernameDisplay.style.display = "none";
     settingsBtn.style.display = "none";
     showSection(authSection);
+    if (window.onUserChange) window.onUserChange(); // <-- Quests für User zurücksetzen!
   }
 
   // Lektionen Liste anzeigen
@@ -523,39 +572,55 @@
 
   // Antwort prüfen
   function checkAnswer(selectedIndex, btnClicked) {
-    const q = selectedLesson.questions[currentQuestionIndex];
-    const buttons = answersContainer.querySelectorAll("button");
-    buttons.forEach(b => {
-      b.classList.add("disabled");
-      b.onclick = null;
-    });
+  const q = selectedLesson.questions[currentQuestionIndex];
+  const buttons = answersContainer.querySelectorAll("button");
+  buttons.forEach(b => {
+    b.classList.add("disabled");
+    b.onclick = null;
+  });
 
-    if (selectedIndex === q.correct) {
-      btnClicked.classList.add("correct");
-      lessonMessage.textContent = "Richtig!";
-      lessonMessage.className = "success";
-    } else {
-      btnClicked.classList.add("incorrect");
-      lessonMessage.textContent = "Falsch! Richtig wäre: " + q.answers[q.correct];
-      lessonMessage.className = "";
-      // Richtige Antwort hervorheben
-      buttons[q.correct].classList.add("correct");
-    }
+  if (selectedIndex === q.correct) {
+    btnClicked.classList.add("correct");
+    lessonMessage.textContent = "Richtig!";
+    lessonMessage.className = "success";
+    // Quest-Fortschritt für richtige Antwort melden
+    if (window.questFrageRichtig) window.questFrageRichtig();
+  } else {
+    btnClicked.classList.add("incorrect");
+    lessonMessage.textContent = "Falsch! Richtig wäre: " + q.answers[q.correct];
+    lessonMessage.className = "";
+    buttons[q.correct].classList.add("correct");
+  }
 
     // Nächste Frage oder Ende nach 1.5 Sekunden
     setTimeout(() => {
       currentQuestionIndex++;
       if (currentQuestionIndex >= selectedLesson.questions.length) {
-        // Lektion beendet
-        progressBar.style.width = "100%";
-        lessonMessage.textContent = "Lektion abgeschlossen!";
-        lessonMessage.className = "success";
-        answersContainer.innerHTML = "";
-      } else {
-        renderQuestion();
-      }
+      // Lektion beendet
+     progressBar.style.width = "100%";
+     lessonMessage.textContent = "Lektion abgeschlossen!";
+     lessonMessage.className = "success";
+     answersContainer.innerHTML = "";
+
+  // Quest-Fortschritt melden
+  if (window.questLektionGemacht) window.questLektionGemacht();
+    } else {
+     renderQuestion();
+    }
     }, 1500);
   }
+  if (window.quests) {
+  const quest = window.quests.find(q => q.title === "Mache eine Lektion");
+  if (quest) {
+    console.log("Queststatus:", quest.completed, quest.canComplete);
+  }
+}
+if (window.quests) {
+  const quest = window.quests.find(q => q.title === "Beantworte 5 Fragen richtig");
+  if (quest) {
+    console.log("Queststatus:", quest.completed, quest.canComplete);
+  }
+}
 
   // Navigation Bottom Bar Klick
   function navBarClick(event) {
@@ -569,11 +634,43 @@
 
     switch (sectionName) {
       case "menu": showSection(menuSection); break;
-      case "shop": showSection(document.getElementById("shopView")); break;
+      case "shop": showSection(document.getElementById("shopView")); renderShop(); break;
       case "rank": showSection(document.getElementById("rankView")); break;
       case "quest": showSection(document.getElementById("questView")); break;
     }
   }
+
+  // Shop anzeigen
+function renderShop() {
+  const shopView = document.getElementById("shopView");
+  shopView.innerHTML = `<h2>Shop</h2><div id="shopList"></div><div id="shopMessage" style="margin-top:12px;color:#2a8;font-weight:600;"></div>`;
+  const shopList = document.getElementById("shopList");
+  shopItems.forEach(item => {
+    const owned = (userDB[currentUser]?.ownedItems || []).includes(item.id);
+    const div = document.createElement("div");
+    div.className = "shop-item";
+    div.style = "background:#f8f8ff;border-radius:12px;padding:16px 14px;margin-bottom:14px;box-shadow:0 2px 8px rgba(0,0,0,0.07);display:flex;justify-content:space-between;align-items:center;";
+    div.innerHTML = `
+      <div>
+        <div style="font-weight:700;font-size:17px;">${item.name}</div>
+        <div style="font-size:14px;color:#555;">${item.description}</div>
+        <div style="margin-top:6px;color:#4caf50;font-weight:600;">${item.price} Coins</div>
+      </div>
+      <button ${owned ? "disabled" : ""} style="margin-left:18px;padding:8px 18px;border-radius:8px;background:${owned ? "#bbb" : "#4caf50"};color:white;font-weight:600;border:none;cursor:${owned ? "not-allowed" : "pointer"};" data-id="${item.id}">
+        ${owned ? "Gekauft" : "Kaufen"}
+      </button>
+    `;
+    shopList.appendChild(div);
+  });
+
+  // Button-Events
+  shopList.querySelectorAll("button[data-id]").forEach(btn => {
+    btn.onclick = function() {
+      const id = parseInt(btn.dataset.id);
+      buyShopItem(id);
+    };
+  });
+}
 
   // Event Listeners
   loginBtn.addEventListener("click", () => {
@@ -598,15 +695,171 @@
     settingsModal.style.display = "none";
   });
 
-  // Beim Laden: Wenn User im SessionStorage ist, direkt App anzeigen
-  if (currentUser && userDB[currentUser]) {
-    showAppAfterLogin();
-  } else {
-    showSection(authSection);
+  // Tab-Wechsel
+  settingsTabAccount.onclick = () => {
+    settingsTabAccount.classList.add("active");
+    settingsTabAvatar.classList.remove("active");
+    settingsTabThemes.classList.remove("active");
+    settingsAccount.style.display = "";
+    settingsAvatar.style.display = "none";
+    settingsThemes.style.display = "none";
+  };
+  settingsTabAvatar.onclick = () => {
+    settingsTabAccount.classList.remove("active");
+    settingsTabAvatar.classList.add("active");
+    settingsTabThemes.classList.remove("active");
+    settingsAccount.style.display = "none";
+    settingsAvatar.style.display = "";
+    settingsThemes.style.display = "none";
+    renderAvatarEquipList();
+  };
+  settingsTabThemes.onclick = () => {
+    settingsTabAccount.classList.remove("active");
+    settingsTabAvatar.classList.remove("active");
+    settingsTabThemes.classList.add("active");
+    settingsAccount.style.display = "none";
+    settingsAvatar.style.display = "none";
+    settingsThemes.style.display = "";
+    renderThemeList();
+  };
+
+  // Avatar-Equip-Liste anzeigen
+  function renderAvatarEquipList() {
+    const user = userDB[currentUser];
+    if (!user) return;
+    if (!user.equippedAvatars) user.equippedAvatars = [];
+    avatarEquipList.innerHTML = "<div style='margin-bottom:10px;font-weight:600;'>Ausrüstbare Items (Mehrfachauswahl möglich):</div>";
+    const ownedAvatars = (user.ownedItems || [])
+      .map(id => shopItems.find(i => i.id === id && i.type === "avatar"))
+      .filter(Boolean);
+    if (ownedAvatars.length === 0) {
+      avatarEquipList.innerHTML += "<div style='color:#888;'>Du hast noch keine Avatar-Items gekauft.</div>";
+      return;
+    }
+    ownedAvatars.forEach(item => {
+      const equipped = user.equippedAvatars.includes(item.avatar);
+      const div = document.createElement("div");
+      div.style = "display:flex;align-items:center;justify-content:space-between;margin-bottom:10px;";
+      div.innerHTML = `
+        <span>${item.name}</span>
+        <button style="margin-left:18px;padding:6px 18px;border-radius:8px;background:${equipped ? "#bbb" : "#333"};color:white;font-weight:600;border:none;cursor:pointer;">
+          ${equipped ? "Entfernen" : "Ausrüsten"}
+        </button>
+      `;
+      div.querySelector("button").onclick = function() {
+        equipAvatar(item.avatar);
+        renderAvatarEquipList();
+        renderProfilePic();
+      };
+      avatarEquipList.appendChild(div);
+    });
+    // Standard-Avatar-Button (alles abwählen)
+    const equipped = user.equippedAvatars.length === 0;
+    const div = document.createElement("div");
+    div.style = "display:flex;align-items:center;justify-content:space-between;margin-bottom:10px;";
+    div.innerHTML = `
+      <span>Standard</span>
+      <button ${equipped ? "disabled" : ""} style="margin-left:18px;padding:6px 18px;border-radius:8px;background:${equipped ? "#bbb" : "#333"};color:white;font-weight:600;border:none;cursor:${equipped ? "not-allowed" : "pointer"};">
+        ${equipped ? "Aktiv" : "Ausrüsten"}
+      </button>
+    `;
+    div.querySelector("button").onclick = function() {
+      equipAvatar(null);
+      renderAvatarEquipList();
+      renderProfilePic();
+    };
+    avatarEquipList.appendChild(div);
   }
+
+  // Avatar ausrüsten
+  function equipAvatar(avatarName) {
+    const user = userDB[currentUser];
+    if (!user.equippedAvatars) user.equippedAvatars = [];
+    // Toggle: Wenn schon drin, entferne, sonst füge hinzu
+    if (avatarName && user.equippedAvatars.includes(avatarName)) {
+      user.equippedAvatars = user.equippedAvatars.filter(a => a !== avatarName);
+    } else if (avatarName) {
+      user.equippedAvatars.push(avatarName);
+    } else {
+      user.equippedAvatars = [];
+    }
+    localStorage.setItem("userDB", JSON.stringify(userDB));
+  }
+
+  // Profilbild rendern
+  function renderProfilePic() {
+    const user = userDB[currentUser];
+    const pic = document.getElementById("profilePic");
+    let html = `<span style="position:relative;">🙂</span>`;
+    if (user && user.equippedAvatars && user.equippedAvatars.length) {
+      html = `<span style="position:relative;display:inline-block;width:38px;height:38px;">`;
+      if (user.equippedAvatars.includes("hut")) {
+        html += `<span style="position:absolute;top:2px;left:7px;font-size:18px;z-index:2;">🎩</span>`;
+      }
+      if (user.equippedAvatars.includes("brille")) {
+        html += `<span style="position:absolute;top:13px;left:7px;font-size:16px;z-index:2;">🕶️</span>`;
+      }
+      html += `<span style="position:relative;z-index:1;">🙂</span></span>`;
+    }
+    pic.innerHTML = html;
+  }
+
+  // Nach Login/Seitenstart Profilbild anzeigen
+  if (currentUser && userDB[currentUser]) {
+    renderProfilePic();
+  }
+
+  window.userDB = userDB;
+window.currentUser = currentUser;
+window.updateCoinDisplay = updateCoinDisplay;
+
+function updateCoinDisplay() {
+  const coins = userDB[currentUser]?.coins || 0;
+  const xpDisplay = document.getElementById("xpDisplay");
+  xpDisplay.textContent = `Coins: ${coins}`;
+  xpDisplay.style.display = "inline-block";
+}
+
+function buyShopItem(id) {
+  const item = shopItems.find(i => i.id === id);
+  if (!item) return;
+  const user = userDB[currentUser];
+  if (!user.ownedItems) user.ownedItems = [];
+  if (user.ownedItems.includes(id)) {
+    document.getElementById("shopMessage").textContent = "Du besitzt dieses Item bereits.";
+    return;
+  }
+  if (user.coins < item.price) {
+    document.getElementById("shopMessage").textContent = "Nicht genug Coins!";
+    return;
+  }
+  user.coins -= item.price;
+  user.ownedItems.push(id);
+  localStorage.setItem("userDB", JSON.stringify(userDB));
+  updateCoinDisplay();
+  renderShop();
+  document.getElementById("shopMessage").textContent = `Gekauft: ${item.name}!`;
+  if (item.type === "theme" && !user.activeTheme) {
+  equipTheme(item.theme);
+}
+}
 
 })();
 </script>
-
+<!-- Quest-Overlay -->
+<div id="questOverlay" style="display:none;position:fixed;left:0;top:0;width:100vw;height:100vh;z-index:9999;background:rgba(0,0,0,0.4);align-items:center;justify-content:center;">
+  <div style="background:#fff;padding:32px 28px;border-radius:16px;box-shadow:0 4px 24px rgba(0,0,0,0.15);text-align:center;min-width:220px;">
+    <h3 id="questOverlayTitle" style="margin-bottom:12px;"></h3>
+    <div id="questOverlayText" style="margin-bottom:18px;"></div>
+    <button onclick="document.getElementById('questOverlay').style.display='none'" style="padding:8px 22px;border-radius:8px;background:#4caf50;color:#fff;border:none;font-weight:600;">OK</button>
+  </div>
+</div>
+<script>
+const shopItems = [
+  { id: 1, name: "Avatar Hut", price: 20, description: "Ein schicker Hut für dein Profilbild.", type: "avatar", avatar: "hut" },
+  { id: 2, name: "Avatar Brille", price: 30, description: "Coole Brille für dein Profilbild.", type: "avatar", avatar: "brille" },
+  { id: 3, name: "Farbthema Blau", price: 50, description: "Blaues Farbschema für die App.", type: "theme", theme: "blue" }
+];
+</script>
 </body>
 </html>
