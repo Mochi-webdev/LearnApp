@@ -106,12 +106,12 @@
   }
 
   /* Verstecke alle Sektionen standardmäßig */
-  #auth, #menu, #lessonView, #shopView, #rankView, #questView, #settingsModal {
-    display: none;
-  }
-  .show {
-    display: block !important;
-  }
+  #auth, #menu, #lessonView, #shopView, #rankView, #questView, #pontesView, #settingsModal {
+  display: none;
+}
+.show {
+  display: block !important;
+}
 
   /* Lektionen */
   .lesson-card {
@@ -345,6 +345,11 @@ button:hover {
   </div>
 </div>
 
+  <!-- Pontes Lektionen Bereich -->
+  <div id="pontesView" class="card">
+  <h2>Pontes Lektionen</h2>
+  <div id="pontesLessonList"></div>
+</div>
   
 
 </div>
@@ -367,6 +372,10 @@ button:hover {
     <svg viewBox="0 0 24 24"><path d="M17 4V2H7v2H2v4a7 7 0 0 0 14 0V4zm-7 4v5h2v-5z"/></svg>
     Rang
   </div>
+  <div class="nav-btn" data-section="pontes" title="Pontes">
+  <svg viewBox="0 0 24 24"><path d="M12 2L2 7v2c0 5.55 3.84 10.74 10 13 6.16-2.26 10-7.45 10-13V7z"/></svg>
+  Pontes
+</div>
 </div>
 
 <!-- Settings Modal -->
@@ -446,13 +455,16 @@ button:hover {
     [authSection, menuSection, lessonView,
      document.getElementById("shopView"),
      document.getElementById("rankView"),
-     document.getElementById("questView")].forEach(s => s.classList.remove("show"));
+     document.getElementById("questView"),
+     document.getElementById("pontesView") // <-- HIER ergänzen!
+    ].forEach(s => s.classList.remove("show"));
 
     // Bottom Nav Bar: Aktivieren / Deaktivieren
     if (section === menuSection || section === lessonView
         || section === document.getElementById("shopView")
         || section === document.getElementById("rankView")
-        || section === document.getElementById("questView")) {
+        || section === document.getElementById("questView")
+        || section === document.getElementById("pontesView")) { // <-- HIER ergänzen!
       bottomNavBar.style.display = "flex";
     } else {
       bottomNavBar.style.display = "none";
@@ -529,17 +541,19 @@ button:hover {
   // Lektionen Liste anzeigen
   function renderLessonList() {
     lessonList.innerHTML = "";
-    lessons.forEach(lesson => {
-      const div = document.createElement("div");
-      div.className = "lesson-card";
-      div.textContent = lesson.title;
-      div.onclick = () => {
-        selectedLesson = lesson;
-        currentQuestionIndex = 0;
-        startLesson();
-      };
-      lessonList.appendChild(div);
-    });
+    lessons
+      .filter(lesson => !lesson.title.toLowerCase().includes("pontes")) // Nur NICHT-Pontes-Lektionen!
+      .forEach(lesson => {
+        const div = document.createElement("div");
+        div.className = "lesson-card";
+        div.textContent = lesson.title;
+        div.onclick = () => {
+          selectedLesson = lesson;
+          currentQuestionIndex = 0;
+          startLesson();
+        };
+        lessonList.appendChild(div);
+      });
   }
 
   // Start Lektion: erste Frage laden
@@ -637,6 +651,10 @@ if (window.quests) {
       case "shop": showSection(document.getElementById("shopView")); renderShop(); break;
       case "rank": showSection(document.getElementById("rankView")); break;
       case "quest": showSection(document.getElementById("questView")); break;
+      case "pontes":
+        showSection(document.getElementById("pontesView"));
+        renderPontesLessonList();
+        break;
     }
   }
 
@@ -842,6 +860,23 @@ function buyShopItem(id) {
   if (item.type === "theme" && !user.activeTheme) {
   equipTheme(item.theme);
 }
+}
+
+function renderPontesLessonList() {
+  const pontesLessonList = document.getElementById("pontesLessonList");
+  pontesLessonList.innerHTML = "";
+  lessons.filter(lesson => lesson.title.toLowerCase().includes("pontes"))
+    .forEach(lesson => {
+      const div = document.createElement("div");
+      div.className = "lesson-card";
+      div.textContent = lesson.title;
+      div.onclick = () => {
+        selectedLesson = lesson;
+        currentQuestionIndex = 0;
+        startLesson();
+      };
+      pontesLessonList.appendChild(div);
+    });
 }
 
 })();
