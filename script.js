@@ -229,7 +229,7 @@ const lessons = [
 },
 {
   id: "lektion6",
-  title: "Häufigste Wörter",
+  title: "Häufigsten Wörter",
   questions: [
     { question: "Was bedeutet 'et'?", answers: ["aber", "und", "oder", "weil"], correct: 1 },
     { question: "Was bedeutet 'in'?", answers: ["aus", "mit", "in", "ohne"], correct: 2 },
@@ -255,6 +255,77 @@ const lessons = [
     { question: "Was bedeutet 'vos'?", answers: ["wir", "sie", "ihr", "du"], correct: 2 },
     { question: "Was bedeutet 'de'?", answers: ["mit", "von", "zu", "in"], correct: 1 },
     { question: "Was bedeutet 'hoc'?", answers: ["dies", "jenes", "alle", "niemand"], correct: 0 }
+  ]
+},
+{
+  id: "lektion7",
+  title: "Sachthema Odysseus",
+  questions: [
+    {
+      question: "Wie heißt Odysseus auf Latein?",
+      answers: ["Ulixes", "Aeneas", "Achilles", "Hercules"],
+      correct: 0
+    },
+    {
+      question: "Wer war Odysseus' Ehefrau?",
+      answers: ["Penelope", "Helena", "Kirke", "Kalypso"],
+      correct: 0
+    },
+    {
+      question: "Wie heißt der Sohn von Odysseus?",
+      answers: ["Telemachos", "Achilles", "Laertes", "Menelaos"],
+      correct: 0
+    },
+    {
+      question: "Welches berühmte Kriegslisten-Werk wird Odysseus zugeschrieben?",
+      answers: ["Trojanisches Pferd", "Ilias", "Argonautenschiff", "Labyrinth"],
+      correct: 0
+    },
+    {
+      question: "Wie entkam Odysseus dem Zyklopen Polyphem?",
+      answers: [
+        "Er nannte sich Niemand und blendete ihn",
+        "Er kämpfte mit ihm",
+        "Er bestach ihn mit Gold",
+        "Er verwandelte sich in ein Tier"
+      ],
+      correct: 0
+    },
+    {
+      question: "Wie schützte sich Odysseus vor dem Gesang der Sirenen?",
+      answers: [
+        "Er ließ sich am Mast festbinden",
+        "Er sprang ins Wasser",
+        "Er hielt sich die Ohren zu",
+        "Er kämpfte gegen sie"
+      ],
+      correct: 0
+    },
+    {
+      question: "Wer verwandelte Odysseus' Gefährten in Schweine?",
+      answers: ["Kirke", "Kalypso", "Athene", "Penelope"],
+      correct: 0
+    },
+    {
+      question: "Wie lange war Odysseus insgesamt unterwegs, bevor er nach Ithaka zurückkehrte?",
+      answers: ["20 Jahre", "5 Jahre", "10 Jahre", "30 Jahre"],
+      correct: 0
+    },
+    {
+      question: "Wie besiegte Odysseus die Freier seiner Frau?",
+      answers: [
+        "Mit Hilfe seines Sohnes und einem Bogen",
+        "Allein im Zweikampf",
+        "Durch einen Zauber",
+        "Mit Hilfe der Sirenen"
+      ],
+      correct: 0
+    },
+    {
+      question: "Welche Göttin half Odysseus besonders oft?",
+      answers: ["Athene", "Aphrodite", "Hera", "Artemis"],
+      correct: 0
+    }
   ]
 },
 
