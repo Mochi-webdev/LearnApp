@@ -226,6 +226,36 @@ const lessons = [
     },
     
   ]
-}
+},
+{
+  id: "lektion6",
+  title: "Häufigste Wörter",
+  questions: [
+    { question: "Was bedeutet 'et'?", answers: ["aber", "und", "oder", "weil"], correct: 1 },
+    { question: "Was bedeutet 'in'?", answers: ["aus", "mit", "in", "ohne"], correct: 2 },
+    { question: "Was bedeutet 'est'?", answers: ["ist", "war", "hat", "wird"], correct: 0 },
+    { question: "Was bedeutet 'non'?", answers: ["schon", "nicht", "jetzt", "bald"], correct: 1 },
+    { question: "Was bedeutet 'qui'?", answers: ["wer", "warum", "welcher", "wie"], correct: 2 },
+    { question: "Was bedeutet 'cum'?", answers: ["mit", "gegen", "ohne", "für"], correct: 0 },
+    { question: "Was bedeutet 'ad'?", answers: ["aus", "zu", "über", "von"], correct: 1 },
+    { question: "Was bedeutet 'si'?", answers: ["obwohl", "weil", "wenn", "damit"], correct: 2 },
+    { question: "Was bedeutet 'sed'?", answers: ["und", "aber", "denn", "oder"], correct: 1 },
+    { question: "Was bedeutet 'ut'?", answers: ["ob", "wie", "damit", "weil"], correct: 1 },
+    { question: "Was bedeutet 'per'?", answers: ["gegen", "durch", "für", "ohne"], correct: 1 },
+    { question: "Was bedeutet 'ex'?", answers: ["mit", "aus", "zu", "in"], correct: 1 },
+    { question: "Was bedeutet 'atque'?", answers: ["und", "weil", "aber", "oder"], correct: 0 },
+    { question: "Was bedeutet 'ego'?", answers: ["sie", "ich", "du", "er"], correct: 1 },
+    { question: "Was bedeutet 'tu'?", answers: ["wir", "du", "ich", "sie"], correct: 1 },
+    { question: "Was bedeutet 'ille'?", answers: ["dieser", "jener", "alle", "niemand"], correct: 1 },
+    { question: "Was bedeutet 'is'?", answers: ["wir", "sie", "er", "es"], correct: 2 },
+    { question: "Was bedeutet 'a/ab'?", answers: ["mit", "zu", "von", "in"], correct: 2 },
+    { question: "Was bedeutet 'meus'?", answers: ["dein", "unser", "mein", "sein"], correct: 2 },
+    { question: "Was bedeutet 'te'?", answers: ["ihn", "uns", "dich", "mich"], correct: 2 },
+    { question: "Was bedeutet 'nos'?", answers: ["sie", "wir", "ihr", "du"], correct: 1 },
+    { question: "Was bedeutet 'vos'?", answers: ["wir", "sie", "ihr", "du"], correct: 2 },
+    { question: "Was bedeutet 'de'?", answers: ["mit", "von", "zu", "in"], correct: 1 },
+    { question: "Was bedeutet 'hoc'?", answers: ["dies", "jenes", "alle", "niemand"], correct: 0 }
+  ]
+},
 
   ];
