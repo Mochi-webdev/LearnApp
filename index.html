@@ -489,7 +489,8 @@ button:hover {
       authMessage.textContent = "Falsches Passwort.";
       return false;
     }
-    currentUser = username;
+    if (userDB[username].xp === undefined) userDB[username].xp = 0; // XP initialisieren
+currentUser = username;
     sessionStorage.setItem("currentUser", currentUser);
     authMessage.textContent = "";
     showAppAfterLogin();
@@ -507,7 +508,7 @@ button:hover {
       authMessage.textContent = "Benutzername schon vergeben.";
       return false;
     }
-    userDB[username] = { password, coins: 0 };
+    userDB[username] = { password, coins: 0, xp: 0 };
     localStorage.setItem("userDB", JSON.stringify(userDB));
     authMessage.textContent = "Registrierung erfolgreich! Bitte anmelden.";
     updateCoinDisplay(); // <-- Coins anzeigen (optional)
@@ -597,8 +598,10 @@ button:hover {
     btnClicked.classList.add("correct");
     lessonMessage.textContent = "Richtig!";
     lessonMessage.className = "success";
-    // Quest-Fortschritt für richtige Antwort melden
-    if (window.questFrageRichtig) window.questFrageRichtig();
+    // XP vergeben
+    userDB[currentUser].xp = (userDB[currentUser].xp || 0) + 10;
+    localStorage.setItem("userDB", JSON.stringify(userDB));
+    updateXPBar();
   } else {
     btnClicked.classList.add("incorrect");
     lessonMessage.textContent = "Falsch! Richtig wäre: " + q.answers[q.correct];
@@ -649,7 +652,7 @@ if (window.quests) {
     switch (sectionName) {
       case "menu": showSection(menuSection); break;
       case "shop": showSection(document.getElementById("shopView")); renderShop(); break;
-      case "rank": showSection(document.getElementById("rankView")); break;
+      case "rank": showSection(document.getElementById("rankView")); renderRankView(); break;
       case "quest": showSection(document.getElementById("questView")); break;
       case "pontes":
         showSection(document.getElementById("pontesView"));
@@ -879,6 +882,64 @@ function renderPontesLessonList() {
     });
 }
 
+// Ränge und XP-Stufen (schwerer gemacht)
+const ranks = [
+  { name: "Bronze", minXP: 0,    icon: "🥉", color: "#b08d57" },
+  { name: "Silber", minXP: 100,  icon: "🥈", color: "#bfc1c2" },
+  { name: "Gold", minXP: 250,    icon: "🥇", color: "#ffd700" },
+  { name: "Platin", minXP: 500,  icon: "💎", color: "#7ad7f0" },
+  { name: "Emerald", minXP: 900, icon: "🟩", color: "#50c878" },
+  { name: "Champion", minXP: 1500, icon: "🏆", color: "#1976d2" }
+];
+
+function getRank(xp) {
+  let rank = ranks[0];
+  for (let i = 1; i < ranks.length; i++) {
+    if (xp >= ranks[i].minXP) rank = ranks[i];
+  }
+  return rank;
+}
+
+function getNextRank(xp) {
+  for (let i = 0; i < ranks.length; i++) {
+    if (xp < ranks[i].minXP) return ranks[i];
+  }
+  return null;
+}
+
+function renderRankView() {
+  const rankView = document.getElementById("rankView");
+  const user = userDB[currentUser];
+  const xp = user?.xp || 0;
+  const rank = getRank(xp);
+  const nextRank = getNextRank(xp);
+  let progress = 1;
+  let progressText = "Maximaler Rang erreicht!";
+  if (nextRank) {
+    const prevXP = rank.minXP;
+    const needed = nextRank.minXP - prevXP;
+    progress = (xp - prevXP) / needed;
+    progressText = `${xp - prevXP} / ${needed} XP bis ${nextRank.name}`;
+  }
+  rankView.innerHTML = `
+    <h2>Rang: ${rank.name}</h2>
+    <div style="font-size:38px;margin-bottom:8px;">
+      <span style="filter: drop-shadow(0 0 4px ${rank.color});">${rank.icon}</span>
+    </div>
+    <div style="margin-bottom:10px;">XP: ${xp}</div>
+    <div style="background:#e3f0ff;border-radius:16px;height:22px;overflow:hidden;margin-bottom:10px;">
+      <div style="background:${rank.color};height:100%;width:${Math.min(progress*100,100)}%;transition:width 0.4s;border-radius:16px;"></div>
+    </div>
+    <div style="font-size:15px;color:${rank.color};">${progressText}</div>
+  `;
+}
+
+function updateXPBar() {
+  if (document.getElementById("rankView").classList.contains("show")) {
+    renderRankView();
+  }
+}
+
 })();
 </script>
 <!-- Quest-Overlay -->
@@ -890,11 +951,78 @@ function renderPontesLessonList() {
   </div>
 </div>
 <script>
+// --- Farbthemen Definition ---
+const themes = [
+  { name: "Standard", id: "default", colors: { "--main-bg": "#fafafa", "--main-color": "#333", "--accent": "#4caf50" } },
+  { name: "Blau", id: "blue", colors: { "--main-bg": "#e3f0ff", "--main-color": "#1565c0", "--accent": "#1976d2" } },
+  { name: "Dunkel", id: "dark", colors: { "--main-bg": "#23272e", "--main-color": "#f5f5f5", "--accent": "#4caf50" } },
+  { name: "Grün", id: "green", colors: { "--main-bg": "#eafaf1", "--main-color": "#388e3c", "--accent": "#43a047" } },
+  { name: "Lila", id: "purple", colors: { "--main-bg": "#f3e8ff", "--main-color": "#7c3aed", "--accent": "#a78bfa" } }
+];
+
+// --- Shop Items erweitern ---
 const shopItems = [
   { id: 1, name: "Avatar Hut", price: 20, description: "Ein schicker Hut für dein Profilbild.", type: "avatar", avatar: "hut" },
   { id: 2, name: "Avatar Brille", price: 30, description: "Coole Brille für dein Profilbild.", type: "avatar", avatar: "brille" },
-  { id: 3, name: "Farbthema Blau", price: 50, description: "Blaues Farbschema für die App.", type: "theme", theme: "blue" }
+  { id: 3, name: "Farbthema Blau", price: 50, description: "Blaues Farbschema für die App.", type: "theme", theme: "blue" },
+  { id: 4, name: "Farbthema Dunkel", price: 50, description: "Dunkles Farbschema für die App.", type: "theme", theme: "dark" },
+  { id: 5, name: "Farbthema Grün", price: 50, description: "Grünes Farbschema für die App.", type: "theme", theme: "green" },
+  { id: 6, name: "Farbthema Lila", price: 50, description: "Lila Farbschema für die App.", type: "theme", theme: "purple" }
 ];
+
+// --- Theme Auswahl & Anwenden ---
+function renderThemeList() {
+  const user = userDB[currentUser];
+  if (!user) return;
+  if (!user.ownedItems) user.ownedItems = [];
+  if (!user.activeTheme) user.activeTheme = "default";
+  themeList.innerHTML = "<div style='margin-bottom:10px;font-weight:600;'>Wähle ein Farbschema:</div>";
+  themes.forEach(theme => {
+    // Standard immer auswählbar, andere nur wenn gekauft
+    const owned = theme.id === "default" || user.ownedItems.some(id => {
+      const item = shopItems.find(i => i.id === id && i.type === "theme");
+      return item && item.theme === theme.id;
+    });
+    const active = user.activeTheme === theme.id;
+    const btn = document.createElement("button");
+    btn.textContent = theme.name + (active ? " (Aktiv)" : "");
+    btn.style = `margin-bottom:8px;background:${active ? "#4caf50" : "#333"};color:white;`;
+    btn.disabled = active;
+    btn.onclick = () => {
+      equipTheme(theme.id);
+      renderThemeList();
+    };
+    if (!owned) {
+      btn.disabled = true;
+      btn.textContent += " (Im Shop freischalten)";
+      btn.style.background = "#bbb";
+    }
+    themeList.appendChild(btn);
+  });
+}
+
+// Theme anwenden
+function equipTheme(themeId) {
+  const user = userDB[currentUser];
+  user.activeTheme = themeId;
+  localStorage.setItem("userDB", JSON.stringify(userDB));
+  applyTheme(themeId);
+}
+
+// Theme auf Seite anwenden
+function applyTheme(themeId) {
+  const theme = themes.find(t => t.id === themeId) || themes[0];
+  Object.entries(theme.colors).forEach(([key, value]) => {
+    document.body.style.setProperty(key, value);
+  });
+}
+
+// Theme beim Login/Seitenstart anwenden
+if (currentUser && userDB[currentUser] && userDB[currentUser].activeTheme) {
+  applyTheme(userDB[currentUser].activeTheme);
+} else {
+  applyTheme("default");
+}
 </script>
 </body>
 </html>
