@@ -2,7 +2,7 @@
 const lessons = [
     {
       id: "lektion1",
-      title: "Lektion 1-Basics",
+      title: "Basics",
       questions: [
         {
           question: "Was bedeutet 'amicus'?",
@@ -39,7 +39,7 @@ const lessons = [
     },
     {
       id: "lektion2",
-      title: "Lektion 2-Fortgeschritten",
+      title: "Fortgeschritten",
       questions: [
         {
           question: "Was heißt 'bellum'?",
@@ -55,7 +55,7 @@ const lessons = [
     },
     {
     id: "lektion3",
-    title: "Lektion 3-Lek.20-Pontes",
+    title: "Lek.20-Pontes",
     questions: [
       {
         question: "Was bedeutet 'vivere'?",
@@ -181,7 +181,7 @@ const lessons = [
   },
   {
   id: "lektion4",
-  title: "Lektion 4-Deklination",
+  title: "Deklination",
   questions: [
     {
       question: "Was ist der Genitiv Singular von 'manus'?",
@@ -217,7 +217,7 @@ const lessons = [
 },
 {
   id: "lektion5",
-  title: "Lektion 5-Lek.19Pontes",
+  title: "Lek.19-Pontes",
   questions: [
     {
       question: "Was bedeutet 'ignorare'?",
